@@ -1,26 +1,17 @@
-// Learn TypeScript:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-
-import Item from "./Item";
+import Item from "../Util/Item";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class StartMenu extends cc.Component {
 
     @property(cc.Node)
-    content: cc.Node
+    content: cc.Node = null;
 
+    // Item:button -> MusicTitle:label
     @property(cc.Prefab)
-    itemPrefab: cc.Node
+    itemPrefab: cc.Prefab = null;
 
-    musics: Item[]
+    musics: Item[] = new Array();
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -28,20 +19,23 @@ export default class StartMenu extends cc.Component {
 
     start() {
         // TODO: Get Resources From Network
-
         this.forDebug();
+
         var array = this.musics;
         var nodes: cc.Node[];
         array.forEach(musicinfo => {
-            this.itemPrefab
+            var item = cc.instantiate(this.itemPrefab);
+            item.children[0].getComponent(cc.Label).string = musicinfo.title;
+            item.parent = this.content;
+            var audio = cc.audioEngine.preload(musicinfo.soundPath);
         });
-        this.content.children
     }
 
+    // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
     forDebug() {
-        this.musics.push(new Item("test1"));
-        this.musics.push(new Item("test2"));
-        this.musics.push(new Item("test3"));
+        this.musics.push(new Item("Protocol Omega", "resources/musics/ADDrumnBass3/1.mp3"));
+        this.musics.push(new Item("Open your eyes you freak", "resources/musics/ADDrumnBass3/2.mp3"));
+        this.musics.push(new Item("Black Future", "resources/musics/ADDrumnBass3/3.mp3"));
     }
     // update (dt) {}
 }
