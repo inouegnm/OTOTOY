@@ -181,7 +181,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "c825be54-81f9-4810-bb5c-9ad0207c75ba"
     },
     "fileId": "cf5xDxQxNCg6YZ4pFFWLMV",
     "sync": false
@@ -284,7 +284,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "c825be54-81f9-4810-bb5c-9ad0207c75ba"
     },
     "fileId": "31/XRsJNpKZbMwdnQorKMx",
     "sync": false
@@ -375,10 +375,12 @@
   },
   {
     "__type__": "cc.ClickEvent",
-    "target": null,
+    "target": {
+      "__id__": 1
+    },
     "component": "",
-    "_componentId": "",
-    "handler": "",
+    "_componentId": "cc.AudioSource",
+    "handler": "play",
     "customEventData": ""
   },
   {
@@ -392,7 +394,7 @@
     "_clip": null,
     "_volume": 1,
     "_mute": false,
-    "_loop": false,
+    "_loop": true,
     "playOnLoad": false,
     "preload": true,
     "_id": ""
@@ -403,7 +405,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "c825be54-81f9-4810-bb5c-9ad0207c75ba"
     },
     "fileId": "94ULSbY+JP37xLhX2BLDIw",
     "sync": false
