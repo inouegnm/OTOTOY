@@ -493,9 +493,7 @@
       "__id__": 11
     },
     "_N$horizontalScrollBar": null,
-    "_N$verticalScrollBar": {
-      "__id__": 9
-    },
+    "_N$verticalScrollBar": null,
     "_id": "30U4ZaquhMnoyhEeBAmMth"
   },
   {
@@ -528,7 +526,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 960,
-      "height": 20
+      "height": 168
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -808,7 +806,7 @@
     "_layoutSize": {
       "__type__": "cc.Size",
       "width": 960,
-      "height": 20
+      "height": 168
     },
     "_resize": 1,
     "_N$layoutType": 2,
@@ -931,9 +929,6 @@
     "_enabled": true,
     "content": {
       "__id__": 11
-    },
-    "itemPrefab": {
-      "__uuid__": "1c58e55d-c36b-4baf-b11f-97bf0384d4fd"
     },
     "_id": "c9uUvg6uNJ1LSb5JKU4ej4"
   },
