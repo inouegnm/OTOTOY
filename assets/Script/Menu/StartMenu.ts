@@ -34,11 +34,9 @@ export default class StartMenu extends cc.Component {
             let item = cc.instantiate(this.itemPrefab);
             item.children[1].getComponent(cc.Label).string = musicinfo.title;
             item.parent = this.content;
-            let move: number = (idx >= array.length - 3) ? item.width * (idx - array.length) : totalWidth;
-            item.setPosition(new cc.Vec2(move, 0));
-            totalWidth += item.width;
             let audioID: number;
-            cc.loader.loadResDir('musics/ADDrumnBass3', cc.AudioClip, (err, clip: cc.AudioClip[]) => {
+            cc.loader.loadResDir(cc.url.raw('resources/musics/ADDrumnBass3'), cc.AudioClip, (err, clip: cc.AudioClip[]) => {
+                cc.log(cc.url.raw('resources/musics/ADDrumnBass3'));
                 if (err) {
                     cc.error(err);
                     return;
@@ -59,20 +57,18 @@ export default class StartMenu extends cc.Component {
             //     cc.audioEngine.playMusic(clip[idx], false)
             // });
         });
-
-        this.content.width = totalWidth;
     }
 
     // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
     forDebug() {
-        this.musics.push(new Item('Protocol Omega', 'musics/ADDrumnBass3/1.mp3'));
-        this.musics.push(new Item('Open your eyes you freak', 'musics/ADDrumnBass3/2.mp3'));
-        this.musics.push(new Item('Black Future', 'musics/ADDrumnBass3/3.mp3'));
-        this.musics.push(new Item('Formula', 'musics/ADDrumnBass3/4.mp3'));
-        this.musics.push(new Item('Eruption', 'musics/ADDrumnBass3/5.mp3'));
-        this.musics.push(new Item('Hacker', 'musics/ADDrumnBass3/6.mp3'));
-        this.musics.push(new Item('4_3', 'musics/ADDrumnBass3/7.mp3'));
-        this.musics.push(new Item('8', 'musics/ADDrumnBass3/8.mp3'));
+        this.musics.push(new Item('Protocol Omega', 'resources/musics/ADDrumnBass3/1.mp3'));
+        this.musics.push(new Item('Open your eyes you freak', 'resources/musics/ADDrumnBass3/2.mp3'));
+        this.musics.push(new Item('Black Future', 'resources/musics/ADDrumnBass3/3.mp3'));
+        this.musics.push(new Item('Formula', 'resources/musics/ADDrumnBass3/4.mp3'));
+        this.musics.push(new Item('Eruption', 'resources/musics/ADDrumnBass3/5.mp3'));
+        this.musics.push(new Item('Hacker', 'resources/musics/ADDrumnBass3/6.mp3'));
+        this.musics.push(new Item('4_3', 'resources/musics/ADDrumnBass3/7.mp3'));
+        this.musics.push(new Item('8', 'resources/musics/ADDrumnBass3/8.mp3'));
     }
     // update (dt) {}
 }
