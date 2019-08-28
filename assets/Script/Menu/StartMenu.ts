@@ -61,15 +61,20 @@ export default class StartMenu extends cc.Component {
         cc.log(cc.audioEngine.isMusicPlaying());
         cc.log(this.audioId);
 
+        // 難易度選択ダイアログを出す
+    }
+
+    onScrolled(event: cc.Event) {
+        // let = event.target
+
+        // 選択対象が変わったときBGMを切り替える
         // if (cc.audioEngine.isMusicPlaying()) {
         //     cc.audioEngine.stopMusic();
         // } else {
         //     this.audioId = cc.audioEngine.playMusic(audioSource.clip, false);
         // }
-    }
 
-    onScrolled(event: cc.Event) {
-        // let = event.target
+        // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
     }
 
     // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
