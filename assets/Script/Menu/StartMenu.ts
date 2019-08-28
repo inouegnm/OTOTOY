@@ -9,33 +9,40 @@ export default class StartMenu extends cc.Component {
 
     itemPrefab: cc.Prefab = null;
     musics: Item[] = new Array();
-    clickEventHandler: cc.Component.EventHandler;
-    audioId: number;
-    backgroundView: cc.Sprite;
+    clickEventHandler: cc.Component.EventHandler = new cc.Component.EventHandler();
+    audioId: number = null;
+    backgroundView: cc.Sprite = null;
+    currentBackgroundView: string = null;
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
         cc.loader.loadRes('prefab/Item', cc.Prefab, (err, item) => {
+            if (err) {
+                cc.error(err);
+                return;
+            }
             this.itemPrefab = item;
         });
-        this.clickEventHandler = new cc.Component.EventHandler();
-        this.clickEventHandler.component = "StartMenu";
-        this.clickEventHandler.handler = "onClickMusicTitle";
-        this.backgroundView = this.node.getChildByName('BackgroundView').getComponent(cc.Sprite);
+        this.backgroundView = this.node.children[1].children[0].getComponent(cc.Sprite);
     }
 
     start() {
+        this.clickEventHandler.component = "StartMenu";
+        this.clickEventHandler.handler = "onClickMusicTitle";
+
         // TODO: Get Resources From Network
         this.forDebug();
 
         let array = this.musics;
+        this.currentBackgroundView = array[0].backgroundImage;
         // 7以下の場合（あり得ない）は足りるように追加（後ほどあり得るかもしれないけど…）
         // while (array.length < 7) {
         //     let add = array[array.length - 2]
         //     array.push(add);
         // }
 
+        let contentChild: cc.Node[] = new Array();
         array.forEach((musicinfo) => {
             let item = cc.instantiate(this.itemPrefab);
             item.parent = this.content;
@@ -65,16 +72,24 @@ export default class StartMenu extends cc.Component {
     }
 
     onScrolled(event: cc.Event) {
-        // let = event.target
+        // 始点70*(n-2)+74
+        // 中点70*(n-1)+74
+        // 終点70*(n)+74
+        // 上の選択肢にフォーカスをあてる
+        console.log(this.content.position.y % 222);
+        if (this.content.position.y % 222 < 0) {
 
-        // 選択対象が変わったときBGMを切り替える
-        // if (cc.audioEngine.isMusicPlaying()) {
+        } else if
+
+        // // 選択対象が変わったときBGMを切り替える
+        // if(targetChanged) {
+        // // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
+        //     if (this.currentBackgroundView != targetChanged.backgroundImage) {
+        //         this.backgroundView = targetChanged.backgroundImage
+        //     }
         //     cc.audioEngine.stopMusic();
-        // } else {
         //     this.audioId = cc.audioEngine.playMusic(audioSource.clip, false);
         // }
-
-        // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
     }
 
     // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
