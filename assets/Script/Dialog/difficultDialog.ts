@@ -13,19 +13,19 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class difficultDialog {
 
+    dialogPrefab: cc.Prefab;
+
     constructor(title: string, soundPath: string, backgroundImage: string) {
-        // this.title = title;
-        // this.soundPath = soundPath;
-        // this.backgroundImage = backgroundImage;
+        let ins = cc.instantiate(this.dialogPrefab);
     }
 
     onLoad() {
-        cc.loader.loadRes('')
+        cc.loader.loadRes('prefab/Dialog', cc.Prefab, (err, item) => {
+            if (err) {
+                cc.error(err);
+                return;
+            }
+            this.dialogPrefab = item;
+        });
     }
-
-    start() {
-
-    }
-
-    // update (dt) {}
 }

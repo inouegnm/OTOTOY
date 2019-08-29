@@ -13,6 +13,8 @@ export default class StartMenu extends cc.Component {
     audioId: number = null;
     backgroundView: cc.Sprite = null;
     currentBackgroundView: string = null;
+    contentChild: cc.Node[] = new Array();
+    selectionArea: cc.Rect;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -24,12 +26,14 @@ export default class StartMenu extends cc.Component {
             }
             this.itemPrefab = item;
         });
-        this.backgroundView = this.node.children[1].children[0].getComponent(cc.Sprite);
     }
 
     start() {
         this.clickEventHandler.component = "StartMenu";
         this.clickEventHandler.handler = "onClickMusicTitle";
+        this.backgroundView = this.node.children[1].children[0].getComponent(cc.Sprite);
+
+        this.createSelectRect();
 
         // TODO: Get Resources From Network
         this.forDebug();
@@ -42,7 +46,6 @@ export default class StartMenu extends cc.Component {
         //     array.push(add);
         // }
 
-        let contentChild: cc.Node[] = new Array();
         array.forEach((musicinfo) => {
             let item = cc.instantiate(this.itemPrefab);
             item.parent = this.content;
@@ -59,6 +62,7 @@ export default class StartMenu extends cc.Component {
             item.children[1].getComponent(cc.Label).string = musicinfo.title;
             this.clickEventHandler.target = item;
             item.getComponent(cc.Button).clickEvents.push(this.clickEventHandler);
+            this.contentChild.push(item);
         });
     }
 
@@ -77,9 +81,11 @@ export default class StartMenu extends cc.Component {
         // 終点70*(n)+74
         // 上の選択肢にフォーカスをあてる
         console.log(this.content.position.y % 222);
-        if (this.content.position.y % 222 < 0) {
-
-        } else if
+        this.contentChild.forEach(item => {
+            if (this.selectionArea.intersects(item.getBoundingBox())) {
+                item.setScale(2, 3);
+            }
+        })
 
         // // 選択対象が変わったときBGMを切り替える
         // if(targetChanged) {
@@ -90,6 +96,11 @@ export default class StartMenu extends cc.Component {
         //     cc.audioEngine.stopMusic();
         //     this.audioId = cc.audioEngine.playMusic(audioSource.clip, false);
         // }
+    }
+
+    createSelectRect() {
+        this.selectionArea = this.node.children[1].children[2].getBoundingBox();
+        console.log(this.selectionArea.center);
     }
 
     // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
