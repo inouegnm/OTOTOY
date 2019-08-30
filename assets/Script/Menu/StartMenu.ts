@@ -8,13 +8,14 @@ export default class StartMenu extends cc.Component {
     content: cc.Node = null;
 
     itemPrefab: cc.Prefab = null;
-    musics: Item[] = new Array();
+    musics: string[][] = new Array();
     clickEventHandler: cc.Component.EventHandler = new cc.Component.EventHandler();
     audioId: number = null;
     backgroundView: cc.Sprite = null;
     currentBackgroundView: string = null;
     contentChild: cc.Node[] = new Array();
     selectionArea: cc.Rect;
+    bgmTitle: string;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -31,6 +32,7 @@ export default class StartMenu extends cc.Component {
     start() {
         this.clickEventHandler.component = "StartMenu";
         this.clickEventHandler.handler = "onClickMusicTitle";
+        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.backgroundView = this.node.children[1].children[0].getComponent(cc.Sprite);
 
         this.createSelectRect();
@@ -39,7 +41,7 @@ export default class StartMenu extends cc.Component {
         this.forDebug();
 
         let array = this.musics;
-        this.currentBackgroundView = array[0].backgroundImage;
+        this.currentBackgroundView = array[0][2];
         // 7以下の場合（あり得ない）は足りるように追加（後ほどあり得るかもしれないけど…）
         // while (array.length < 7) {
         //     let add = array[array.length - 2]
@@ -49,76 +51,93 @@ export default class StartMenu extends cc.Component {
         array.forEach((musicinfo) => {
             let item = cc.instantiate(this.itemPrefab);
             item.parent = this.content;
-            cc.loader.loadRes(musicinfo.soundPath, cc.AudioClip, (err, clip: cc.AudioClip) => {
+            let itemClass: Item = item.getComponent(Item);
+            cc.loader.loadRes(musicinfo[1], cc.AudioClip, (err, clip: cc.AudioClip) => {
                 if (err) {
                     cc.error(err);
                     return;
                 }
-                if (cc.audioEngine.isMusicPlaying) {
-                    cc.audioEngine.stopAll();
-                }
-                item.getComponent(cc.AudioSource).clip = clip;
+                itemClass.setParam(musicinfo[0], clip, musicinfo[2]);
             });
-            item.children[1].getComponent(cc.Label).string = musicinfo.title;
             this.clickEventHandler.target = item;
             item.getComponent(cc.Button).clickEvents.push(this.clickEventHandler);
             this.contentChild.push(item);
+        });
+
+        let firstMusic = this.contentChild[0];
+        firstMusic.children[1].setScale(1.2, 1.2);
+
+        let firstMusicItem = this.contentChild[0].getComponent(Item);
+        // 選択対象が変わったときBGMを切り替える
+        this.audioId = cc.audioEngine.playMusic(firstMusicItem.clip, false);
+        this.bgmTitle = firstMusicItem.title;
+        console.log(firstMusicItem);
+        console.log(firstMusicItem.title);
+        cc.loader.loadRes(firstMusicItem.backgroundImage, cc.SpriteFrame, (err, res) => {
+            if (err) {
+                cc.error(err);
+                return;
+            }
+            this.backgroundView.spriteFrame = res;
         });
     }
 
     onClickMusicTitle(event: cc.Event) {
         let node: cc.Node = event.target;
-        let audioSource: cc.AudioSource = node.getComponent(cc.AudioSource);
-        cc.log(cc.audioEngine.isMusicPlaying());
-        cc.log(this.audioId);
 
         // 難易度選択ダイアログを出す
     }
 
-    onScrolled(event: cc.Event) {
-        // 始点70*(n-2)+74
-        // 中点70*(n-1)+74
-        // 終点70*(n)+74
-        // 上の選択肢にフォーカスをあてる
-        console.log(this.content.position.y % 222);
+    onTouchEnd() {
+        // this.content.position.lerp(cc.Vec2(),);
+    }
 
-        // foreachではなくfilterかselectの方がいい？
-        // this.contentChild.filter(item => this.selectionArea.intersects(item.getBoundingBoxToWorld())).foreach(filteredItem =>{// 該当したものに対する処理});
+    onScrolled(event: cc.Event) {
         this.contentChild.forEach(item => {
-            if (this.selectionArea.intersects(item.getBoundingBoxToWorld())) {
-                item.setScale(2, 2);
-                // // 選択対象が変わったときBGMを切り替える
-                // // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
-                // if (this.currentBackgroundView != item.backgroundImage) {
-                //     this.backgroundView = item.backgroundImage
-                // }
-                // cc.audioEngine.stopMusic();
-                // this.audioId = cc.audioEngine.playMusic(audioSource.clip, false);
+            if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
+                item.children[1].setScale(1.2, 1.2);
+                // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
+                if (this.currentBackgroundView != item.getComponent(Item).backgroundImage) {
+                    cc.loader.loadRes(item.getComponent(Item).backgroundImage, cc.SpriteFrame, (err, res) => {
+                        if (err) {
+                            cc.error(err);
+                            return;
+                        }
+                        this.backgroundView.spriteFrame = res;
+                    });
+                }
+                // 選択対象が変わったときBGMを切り替える
+                if (this.bgmTitle != item.getComponent(Item).title) {
+                    cc.audioEngine.stopMusic();
+                    this.audioId = cc.audioEngine.playMusic(item.getComponent(Item).clip, false);
+                    this.bgmTitle = item.getComponent(Item).title;
+                }
+            } else {
+                item.children.forEach(child => child.setScale(1, 1));
             }
-        })
+        });
     }
 
     createSelectRect() {
         this.selectionArea = this.node.children[1].children[2].getBoundingBoxToWorld();
-        console.log(this.selectionArea.center);
     }
 
     // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
     forDebug() {
-        this.musics.push(new Item('Protocol Omega', 'musics/ADDrumnBass3/1', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Open your eyes you freak', 'musics/ADDrumnBass3/2', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Black Future', 'musics/ADDrumnBass3/3', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Formula', 'musics/ADDrumnBass3/4', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Eruption', 'musics/ADDrumnBass3/5', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Hacker', 'musics/ADDrumnBass3/6', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('4_3', 'musics/ADDrumnBass3/7', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Broken', 'musics/ADDrumnBass3/8', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('I\'m a Fighter', 'musics/ADDrumnBass3/9', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Finally Puzzle', 'musics/ADDrumnBass3/10', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Dawnscape', 'musics/ADDrumnBass3/11', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('Central Nucleus', 'musics/ADDrumnBass3/12', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('So Far Gone', 'musics/ADDrumnBass3/13', 'image/ADDrumnBass3'));
-        this.musics.push(new Item('physics', 'musics/ADDrumnBass3/14', 'image/ADDrumnBass3'));
+        this.musics.push(['Protocol Omega', 'musics/ADDrumnBass3/1', 'image/cover/ADDrumnBass']);
+        this.musics.push(['Open your eyes you freak', 'musics/ADDrumnBass3/2', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Black Future', 'musics/ADDrumnBass3/3', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Formula', 'musics/ADDrumnBass3/4', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Eruption', 'musics/ADDrumnBass3/5', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Hacker', 'musics/ADDrumnBass3/6', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['4_3', 'musics/ADDrumnBass3/7', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Broken', 'musics/ADDrumnBass3/8', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['I\'m a Fighter', 'musics/ADDrumnBass3/9', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Finally Puzzle', 'musics/ADDrumnBass3/10', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Dawnscape', 'musics/ADDrumnBass3/11', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Central Nucleus', 'musics/ADDrumnBass3/12', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['So Far Gone', 'musics/ADDrumnBass3/13', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['physics', 'musics/ADDrumnBass3/14', 'image/cover/ADDrumnBass3']);
     }
     // update (dt) {}
 }

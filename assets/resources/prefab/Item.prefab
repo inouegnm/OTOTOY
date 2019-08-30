@@ -31,6 +31,9 @@
         "__id__": 8
       },
       {
+        "__id__": 9
+      },
+      {
         "__id__": 10
       }
     ],
@@ -214,7 +217,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 940,
+      "width": 780,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -299,11 +302,7 @@
     "_enabled": true,
     "duration": 0.1,
     "zoomScale": 1.2,
-    "clickEvents": [
-      {
-        "__id__": 9
-      }
-    ],
+    "clickEvents": [],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
     "_N$transition": 3,
@@ -374,14 +373,14 @@
     "_id": ""
   },
   {
-    "__type__": "cc.ClickEvent",
-    "target": {
+    "__type__": "e4fdd7//UhOIYQ8V7rVpi7+",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
       "__id__": 1
     },
-    "component": "",
-    "_componentId": "cc.AudioSource",
-    "handler": "play",
-    "customEventData": ""
+    "_enabled": true,
+    "_id": ""
   },
   {
     "__type__": "cc.AudioSource",
@@ -394,9 +393,9 @@
     "_clip": null,
     "_volume": 1,
     "_mute": false,
-    "_loop": true,
+    "_loop": false,
     "playOnLoad": false,
-    "preload": true,
+    "preload": false,
     "_id": ""
   },
   {
