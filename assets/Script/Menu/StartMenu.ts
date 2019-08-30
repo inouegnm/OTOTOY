@@ -83,6 +83,7 @@ export default class StartMenu extends cc.Component {
         console.log(this.content.position.y % 222);
 
         // foreachではなくfilterかselectの方がいい？
+        // this.contentChild.filter(item => this.selectionArea.intersects(item.getBoundingBoxToWorld())).foreach(filteredItem =>{// 該当したものに対する処理});
         this.contentChild.forEach(item => {
             if (this.selectionArea.intersects(item.getBoundingBoxToWorld())) {
                 item.setScale(2, 2);
