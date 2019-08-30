@@ -82,7 +82,7 @@ export default class StartMenu extends cc.Component {
         // 上の選択肢にフォーカスをあてる
         console.log(this.content.position.y % 222);
         this.contentChild.forEach(item => {
-            if (this.selectionArea.intersects(item.getBoundingBox())) {
+            if (this.selectionArea.intersects(item.getBoundingBoxToWorld())) {
                 item.setScale(2, 3);
             }
         })
@@ -99,7 +99,7 @@ export default class StartMenu extends cc.Component {
     }
 
     createSelectRect() {
-        this.selectionArea = this.node.children[1].children[2].getBoundingBox();
+        this.selectionArea = this.node.children[1].children[2].getBoundingBoxToWorld();
         console.log(this.selectionArea.center);
     }
 
