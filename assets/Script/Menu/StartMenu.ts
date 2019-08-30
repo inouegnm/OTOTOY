@@ -81,21 +81,20 @@ export default class StartMenu extends cc.Component {
         // 終点70*(n)+74
         // 上の選択肢にフォーカスをあてる
         console.log(this.content.position.y % 222);
+
+        // foreachではなくfilterかselectの方がいい？
         this.contentChild.forEach(item => {
             if (this.selectionArea.intersects(item.getBoundingBoxToWorld())) {
-                item.setScale(2, 3);
+                item.setScale(2, 2);
+                // // 選択対象が変わったときBGMを切り替える
+                // // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
+                // if (this.currentBackgroundView != item.backgroundImage) {
+                //     this.backgroundView = item.backgroundImage
+                // }
+                // cc.audioEngine.stopMusic();
+                // this.audioId = cc.audioEngine.playMusic(audioSource.clip, false);
             }
         })
-
-        // // 選択対象が変わったときBGMを切り替える
-        // if(targetChanged) {
-        // // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
-        //     if (this.currentBackgroundView != targetChanged.backgroundImage) {
-        //         this.backgroundView = targetChanged.backgroundImage
-        //     }
-        //     cc.audioEngine.stopMusic();
-        //     this.audioId = cc.audioEngine.playMusic(audioSource.clip, false);
-        // }
     }
 
     createSelectRect() {
