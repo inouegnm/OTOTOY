@@ -88,7 +88,23 @@ export default class StartMenu extends cc.Component {
         // 難易度選択ダイアログを出す
     }
 
+    // 曖昧な位置にいたとき近くの選択肢に移動する
     onTouchEnd() {
+        // 始点70*(n)
+        // 中点70*(n+1)
+        // 終点70*(n+2)
+        let absY = this.content.position.y < 0 ? -this.content.position.y : this.content.position.y;
+        let distanceNear = currentY % this.selectionArea.height;
+        // 上にフォーカスする
+        if (distanceNear < this.selectionArea.height / 3) {
+            
+        // フォーカスを選択していたものに戻す
+        } else if (distanceNear < this.selectionArea.height / 3 * 2) {
+
+        // 下にフォーカスする
+        } else {
+
+        }
         // this.content.position.lerp(cc.Vec2(),);
     }
 
