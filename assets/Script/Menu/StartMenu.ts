@@ -1,5 +1,9 @@
 import Item from '../Util/Item';
+import Dialog, { dialogType } from '../Dialog/Dialog';
+
 const { ccclass, property } = cc._decorator;
+
+export var selectedMusic: [string, cc.AudioClip] = [null, null];
 
 @ccclass
 export default class StartMenu extends cc.Component {
@@ -16,16 +20,18 @@ export default class StartMenu extends cc.Component {
     contentChild: cc.Node[] = new Array();
     selectionArea: cc.Rect;
     bgmTitle: string;
+    dialogPrefab: cc.Prefab;
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
-        cc.loader.loadRes('prefab/Item', cc.Prefab, (err, item) => {
+        cc.loader.loadResDir('prefab/Item', cc.Prefab, (err, item) => {
             if (err) {
                 cc.error(err);
                 return;
             }
-            this.itemPrefab = item;
+            this.itemPrefab = item[0];
+            this.dialogPrefab = item[1];
         });
     }
 
@@ -64,51 +70,56 @@ export default class StartMenu extends cc.Component {
             this.contentChild.push(item);
         });
 
-        let firstMusic = this.contentChild[0];
-        firstMusic.children[1].setScale(1.2, 1.2);
+        // なぜかItem以下がundefindになる
+        // let firstMusic = this.contentChild[0];
+        // firstMusic.children[1].setScale(1.2, 1.2);
 
-        let firstMusicItem = this.contentChild[0].getComponent(Item);
-        // 選択対象が変わったときBGMを切り替える
-        this.audioId = cc.audioEngine.playMusic(firstMusicItem.clip, false);
-        this.bgmTitle = firstMusicItem.title;
-        console.log(firstMusicItem);
-        console.log(firstMusicItem.title);
-        cc.loader.loadRes(firstMusicItem.backgroundImage, cc.SpriteFrame, (err, res) => {
-            if (err) {
-                cc.error(err);
-                return;
-            }
-            this.backgroundView.spriteFrame = res;
-        });
+        // let firstMusicItem = this.contentChild[0].getComponent(Item);
+        // this.audioId = cc.audioEngine.playMusic(firstMusicItem.clip, false);
+        // this.bgmTitle = firstMusicItem.title;
+        // console.log(this.bgmTitle)
+        // cc.loader.loadRes(firstMusicItem.backgroundImage, cc.SpriteFrame, (err, res) => {
+        //     if (err) {
+        //         cc.error(err);
+        //         return;
+        //     }
+        //     this.backgroundView.spriteFrame = res;
+        // });
     }
 
     onClickMusicTitle(event: cc.Event) {
         let node: cc.Node = event.target;
+        selectedMusic = [node.getComponent(Item).title, node.getComponent(Item).clip];
+        console.log(selectedMusic)
 
         // 難易度選択ダイアログを出す
+        let dialog = cc.instantiate(this.dialogPrefab);
+        dialog.getComponent(Dialog).showDialog(dialogType.difficulty);
     }
 
     // 曖昧な位置にいたとき近くの選択肢に移動する
     onTouchEnd() {
-        // 始点70*(n)
-        // 中点70*(n+1)
-        // 終点70*(n+2)
-        let absY = this.content.position.y < 0 ? -this.content.position.y : this.content.position.y;
-        let distanceNear = currentY % this.selectionArea.height;
-        // 上にフォーカスする
-        if (distanceNear < this.selectionArea.height / 3) {
-            
-        // フォーカスを選択していたものに戻す
-        } else if (distanceNear < this.selectionArea.height / 3 * 2) {
+        // contentの高さの絶対値から初期値分引いたもの
+        let absY = this.content.position.y < 0 ? -this.content.position.y - 74 : this.content.position.y - 74;
+        // absYをItemの高さ(148?)で割った余り
+        let distanceNear = absY % 148;
+        let moveTo: number = this.content.position.y;
 
-        // 下にフォーカスする
-        } else {
-
+        if (distanceNear < 37) { // 上にフォーカスする
+            moveTo -= distanceNear;
+        } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
+            moveTo += 74 > distanceNear ? 74 + distanceNear : 74 - distanceNear;
+        } else { // 下にフォーカスする
+            moveTo += this.contentChild[0].height - distanceNear;
         }
-        // this.content.position.lerp(cc.Vec2(),);
+
+        // アニメーション
+        new cc.Tween().target(this.content)
+            .to(0.5, { position: new cc.Vec2(0, moveTo) }, { progress: null, easing: null }).start();
+        this.onScrolled();
     }
 
-    onScrolled(event: cc.Event) {
+    onScrolled() {
         this.contentChild.forEach(item => {
             if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
                 item.children[1].setScale(1.2, 1.2);

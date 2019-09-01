@@ -8,24 +8,12 @@
 //  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
-const { ccclass, property } = cc._decorator;
+const { ccclass } = cc._decorator;
 
 @ccclass
-export default class difficultDialog {
-
-    dialogPrefab: cc.Prefab;
-
-    constructor(title: string, soundPath: string, backgroundImage: string) {
-        let ins = cc.instantiate(this.dialogPrefab);
-    }
-
-    onLoad() {
-        cc.loader.loadRes('prefab/Dialog', cc.Prefab, (err, item) => {
-            if (err) {
-                cc.error(err);
-                return;
-            }
-            this.dialogPrefab = item;
-        });
+export default class RefrectSpeed extends cc.Component {
+    valueChanged(ev: cc.Event) {
+        let slider: cc.Slider = ev.target;
+        this.node.getComponent(cc.Label).string = (slider.progress * 10).toString();
     }
 }
