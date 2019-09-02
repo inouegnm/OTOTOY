@@ -108,11 +108,11 @@ export default class StartMenu extends cc.Component {
         let moveTo: number = this.content.position.y;
 
         if (distanceNear < 37) { // 上にフォーカスする
-            moveTo -= distanceNear;
+            moveTo -= (74 - distanceNear);
         } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
-            moveTo += distanceNear < 74 ? distanceNear : distanceNear;
+            moveTo += (74 - distanceNear);
         } else { // 下にフォーカスする
-            moveTo += this.contentChild[0].height - distanceNear;
+            moveTo += (222 - distanceNear);
         }
 
         // アニメーション
