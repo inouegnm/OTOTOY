@@ -65,6 +65,8 @@ export default class StartMenu extends cc.Component {
                 }
                 itemClass.setParam(musicinfo[0], clip, musicinfo[2]);
             });
+            // EventHandlerは1.0.0のAPIのため使わない(使えない？)
+            // node.on()に書き換える
             this.clickEventHandler.target = item;
             item.getComponent(cc.Button).clickEvents.push(this.clickEventHandler);
             this.contentChild.push(item);
