@@ -93,8 +93,8 @@ export default class StartMenu extends cc.Component {
         console.log(selectedMusic)
 
         // 難易度選択ダイアログを出す
-        let dialog = cc.instantiate(this.dialogPrefab);
-        dialog.getComponent(Dialog).showDialog(dialogType.difficulty);
+        // let dialog = cc.instantiate(this.dialogPrefab);
+        // dialog.getComponent(Dialog).showDialog(dialogType.difficulty);
     }
 
     // 曖昧な位置にいたとき近くの選択肢に移動する
