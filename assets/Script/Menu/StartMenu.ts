@@ -25,7 +25,7 @@ export default class StartMenu extends cc.Component {
     // LIFE-CYCLE CALLBACKS:
 
     onLoad() {
-        cc.loader.loadResDir('prefab/Item', cc.Prefab, (err, item) => {
+        cc.loader.loadResDir('prefab', cc.Prefab, (err, item) => {
             if (err) {
                 cc.error(err);
                 return;
@@ -114,7 +114,7 @@ export default class StartMenu extends cc.Component {
         }
 
         // アニメーション
-        new cc.Tween().target(this.content)
+        let tween = new cc.Tween().target(this.content)
             .to(0.5, { position: new cc.Vec2(0, moveTo) }, { progress: null, easing: null }).start();
         this.onScrolled();
     }
@@ -124,6 +124,7 @@ export default class StartMenu extends cc.Component {
             if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
                 item.children[1].setScale(1.2, 1.2);
                 // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
+                // 変わったらロードするのではなくactiveの切り替えの方がいいのでは？
                 if (this.currentBackgroundView != item.getComponent(Item).backgroundImage) {
                     cc.loader.loadRes(item.getComponent(Item).backgroundImage, cc.SpriteFrame, (err, res) => {
                         if (err) {
