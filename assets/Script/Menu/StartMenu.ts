@@ -107,6 +107,7 @@ export default class StartMenu extends cc.Component {
         let distanceNear = absY % 148;
         let moveTo: number = this.content.position.y;
 
+        // マイナスの時符号反転
         console.log(distanceNear);
         if (distanceNear < 37) { // 上にフォーカスする
             moveTo -= distanceNear;
@@ -117,6 +118,7 @@ export default class StartMenu extends cc.Component {
         }
         moveTo += 74;
         console.log(moveTo);
+        // ズレる
 
         // アニメーション
         // let tween = new cc.Tween().target(this.content)
