@@ -20,6 +20,8 @@ export default class StartMenu extends cc.Component {
     selectionArea: cc.Rect;
     bgmTitle: string;
     dialogPrefab: cc.Prefab;
+    procSelectedIdx: number;
+    test = new Array();
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -37,6 +39,7 @@ export default class StartMenu extends cc.Component {
         let array = this.musics;
         this.currentBackgroundView = array[0][2];
 
+        // onloadで読ませて保存だと初回instantiateがnullになること
         cc.loader.loadResDir('prefab', cc.Prefab, (err, item) => {
             if (err) {
                 cc.error(err);
@@ -62,7 +65,9 @@ export default class StartMenu extends cc.Component {
                 item.on(cc.Node.EventType.TOUCH_START, this.onTouchStartMusicTitle, item);
                 item.on(cc.Node.EventType.TOUCH_END, this.onTouchEndMusicTitle, item);
                 this.contentChild.push(item);
+                this.test.push(item.position);
             });
+            console.log(this.test)
 
             // // なぜかItem以下がundefindになる
             // let firstMusic = this.contentChild[0];
@@ -123,9 +128,15 @@ export default class StartMenu extends cc.Component {
     onScrolled() {
         this.contentChild.forEach((item, idx) => {
             if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
-                cc.log(idx);
-            }
-            if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
+                // 上にスクロール
+                if (idx > this.procSelectedIdx) {
+                    
+                // 下にスクロール
+                } else if (idx < this.procSelectedIdx) {
+
+                }
+                this.procSelectedIdx = idx;
+
                 item.children[1].setScale(1.2, 1.2);
                 // 選択対象が一つ前に選択していた音楽のアルバムと違っているとき、背景画像を変える
                 // 変わったらロードするのではなくactiveの切り替えの方がいいのでは？
@@ -145,6 +156,8 @@ export default class StartMenu extends cc.Component {
                     this.bgmTitle = item.getComponent(Item).title;
                 }
             } else {
+                // 全てにやる必要はない
+                // →indexもらえるからその前後1つで良い
                 item.children[1].setScale(1, 1);
             }
         });
