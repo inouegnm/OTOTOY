@@ -65,7 +65,7 @@ export default class StartMenu extends cc.Component {
                 item.on(cc.Node.EventType.TOUCH_START, this.onTouchStartMusicTitle, item);
                 item.on(cc.Node.EventType.TOUCH_END, this.onTouchEndMusicTitle, item);
                 this.contentChild.push(item);
-                this.test.push(item.position);
+                this.test.push(this.convertToWorldSpace(item.position));
             });
             console.log(this.test)
 
@@ -129,7 +129,7 @@ export default class StartMenu extends cc.Component {
         this.contentChild.forEach((item, idx) => {
             if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
                 // 上にスクロール
-                if (idx > this.procSelectedIdx) {
+                if (idx > this.procSelectedIdx) { // item.create()
                     
                 // 下にスクロール
                 } else if (idx < this.procSelectedIdx) {
