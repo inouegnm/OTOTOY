@@ -20,8 +20,7 @@ export default class StartMenu extends cc.Component {
     selectionArea: cc.Rect;
     bgmTitle: string;
     dialogPrefab: cc.Prefab;
-    procSelectedIdx: number;
-    test = new Array();
+    procSelectedIdx: number = 6;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -65,9 +64,7 @@ export default class StartMenu extends cc.Component {
                 item.on(cc.Node.EventType.TOUCH_START, this.onTouchStartMusicTitle, item);
                 item.on(cc.Node.EventType.TOUCH_END, this.onTouchEndMusicTitle, item);
                 this.contentChild.push(item);
-                this.test.push(this.convertToWorldSpace(item.position));
             });
-            console.log(this.test)
 
             // // なぜかItem以下がundefindになる
             // let firstMusic = this.contentChild[0];
@@ -104,24 +101,28 @@ export default class StartMenu extends cc.Component {
 
     // 曖昧な位置にいたとき近くの選択肢に移動する
     onTouchEnd() {
-        // // contentの高さの絶対値から初期値分引いたもの
-        // let absY = this.content.position.y < 0 ? -this.content.position.y : this.content.position.y;
-        // // absYをItemの高さ(148?)で割った余り
-        // let distanceNear = absY % 148;
-        // let moveTo: number = this.content.position.y;
+        // contentの高さの絶対値から初期値分引いたもの
+        let absY = this.content.position.y < 0 ? -this.content.position.y : this.content.position.y;
+        // absYをItemの高さ(148→ボタンの高さ+間)で割った余り
+        let distanceNear = absY % 148;
+        let moveTo: number = this.content.position.y;
 
-        // if (distanceNear < 37) { // 上にフォーカスする
-        //     moveTo -= (74 - distanceNear);
-        // } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
-        //     moveTo += (74 - distanceNear);
-        // } else { // 下にフォーカスする
-        //     moveTo += (222 - distanceNear);
-        // }
+        console.log(distanceNear);
+        if (distanceNear < 37) { // 上にフォーカスする
+            moveTo -= distanceNear;
+        } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
+            moveTo += distanceNear < 74 ? (74 - distanceNear) : -(distanceNear - 74);
+        } else { // 下にフォーカスする
+            moveTo += (148 - distanceNear);
+        }
+        moveTo += 74;
+        console.log(moveTo);
 
-        // // アニメーション
+        // アニメーション
         // let tween = new cc.Tween().target(this.content)
-        //     .to(0.5, { position: new cc.Vec2(0, moveTo) }, { progress: null, easing: null })
+        //     .to(0.5, { position: moveTo }, { progress: null, easing: null })
         //     .start();
+        this.content.setPosition(new cc.Vec2(0, moveTo));
         // this.onScrolled();
     }
 
@@ -130,8 +131,8 @@ export default class StartMenu extends cc.Component {
             if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
                 // 上にスクロール
                 if (idx > this.procSelectedIdx) { // item.create()
-                    
-                // 下にスクロール
+
+                    // 下にスクロール
                 } else if (idx < this.procSelectedIdx) {
 
                 }
