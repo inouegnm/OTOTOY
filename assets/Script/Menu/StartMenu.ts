@@ -110,13 +110,12 @@ export default class StartMenu extends cc.Component {
         // マイナスの時符号反転
         console.log(distanceNear);
         if (distanceNear < 37) { // 上にフォーカスする
-            moveTo -= distanceNear;
+            moveTo -= distanceNear - 74;
         } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
             moveTo += distanceNear < 74 ? (74 - distanceNear) : -(distanceNear - 74);
         } else { // 下にフォーカスする
-            moveTo += (148 - distanceNear);
+            moveTo += (148 - distanceNear) + 74;
         }
-        moveTo += 74;
         console.log(moveTo);
         // ズレる
 
