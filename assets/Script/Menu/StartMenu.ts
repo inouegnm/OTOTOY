@@ -78,21 +78,7 @@ export default class StartMenu extends cc.Component {
                 }, item);
                 this.contentChild.push(item);
             });
-
-            // なぜかItem以下がundefindになる
-            let firstMusic = this.contentChild[0];
-            firstMusic.children[1].setScale(1.2, 1.2);
-
-            let firstMusicItem = this.contentChild[0].getComponent(Item);
-            cc.audioEngine.playMusic(firstMusicItem.clip, false);
-            this.bgmTitle = firstMusicItem.title;
-            cc.loader.loadRes(firstMusicItem.backgroundImage, cc.SpriteFrame, (err, res) => {
-                if (err) {
-                    cc.error(err);
-                    return;
-                }
-                this.backgroundView.spriteFrame = res;
-            });
+            this.onTouchEnd()
         });
     }
 
@@ -117,8 +103,10 @@ export default class StartMenu extends cc.Component {
         // アニメーション
         let tween = new cc.Tween().target(this.content)
             .to(0.5, { position: new cc.Vec2(0, moveTo) }, { progress: null, easing: null })
-            .start();
-        this.onScrolled();
+            .start()
+            .call(() => {
+                this.onScrolled();
+            })
     }
 
     onScrolled() {
