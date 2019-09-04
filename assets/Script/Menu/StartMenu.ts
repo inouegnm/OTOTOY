@@ -109,16 +109,17 @@ export default class StartMenu extends cc.Component {
 
         // TODO:マイナスの時符号反転
         if (distanceNear < 37) { // 上にフォーカスする
-            moveTo -= distanceNear + 74;
+            moveTo -= distanceNear - 74;
         } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
             moveTo += 74 - distanceNear;
         } else { // 下にフォーカスする
             moveTo += 222 - distanceNear;
         }
 
+
         // アニメーション
         let tween = new cc.Tween().target(this.content)
-            .to(0.5, { position: moveTo }, { progress: null, easing: null })
+            .to(0.5, { position: new cc.Vec2(0, moveTo) }, { progress: null, easing: null })
             .start();
         // this.onScrolled();
     }
