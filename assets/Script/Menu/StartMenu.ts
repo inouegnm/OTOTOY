@@ -109,7 +109,7 @@ export default class StartMenu extends cc.Component {
 
         // TODO:マイナスの時符号反転
         if (distanceNear < 37) { // 上にフォーカスする
-            moveTo -= distanceNear - 74;
+            moveTo -= (distanceNear + 74);
         } else if (distanceNear < 111) { // フォーカスを選択していたものに戻す
             moveTo += distanceNear < 74 ? (74 - distanceNear) : -(distanceNear - 74);
         } else { // 下にフォーカスする
