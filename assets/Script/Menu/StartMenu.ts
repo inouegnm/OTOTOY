@@ -120,10 +120,9 @@ export default class StartMenu extends cc.Component {
         // ズレる
 
         // アニメーション
-        // let tween = new cc.Tween().target(this.content)
-        //     .to(0.5, { position: moveTo }, { progress: null, easing: null })
-        //     .start();
-        this.content.setPosition(new cc.Vec2(0, moveTo));
+        let tween = new cc.Tween().target(this.content)
+            .to(0.5, { position: moveTo }, { progress: null, easing: null })
+            .start();
         // this.onScrolled();
     }
 
