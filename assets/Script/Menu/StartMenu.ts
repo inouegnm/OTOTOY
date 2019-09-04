@@ -12,14 +12,14 @@ export default class StartMenu extends cc.Component {
     content: cc.Node = null;
 
     itemPrefab: cc.Prefab = null;
-    musics: string[][] = new Array();
-    audioId: number = null;
+    dialogPrefab: cc.Prefab = null;
+
     backgroundView: cc.Sprite = null;
-    currentBackgroundView: string = null;
     contentChild: cc.Node[] = new Array();
-    selectionArea: cc.Rect;
-    bgmTitle: string;
-    dialogPrefab: cc.Prefab;
+    selectionArea: cc.Rect = null;
+    musics: string[][] = new Array();
+    currentBackgroundView: string = null;
+    bgmTitle: string = null;
     procSelectedIdx: number = 6;
 
     // LIFE-CYCLE CALLBACKS:
@@ -61,42 +61,39 @@ export default class StartMenu extends cc.Component {
                     }
                     item.getComponent(Item).setParam(musicinfo[0], clip, musicinfo[2]);
                 });
-                item.on(cc.Node.EventType.TOUCH_START, this.onTouchStartMusicTitle, item);
-                item.on(cc.Node.EventType.TOUCH_END, this.onTouchEndMusicTitle, item);
+                item.on(cc.Node.EventType.TOUCH_START, (event: cc.Event) => {
+                    let node: cc.Node = event.target;
+                    node.setScale(1.2, 1.2);
+                }, item);
+                item.on(cc.Node.EventType.TOUCH_END, (event: cc.Event) => {
+                    let node: cc.Node = event.target;
+                    selectedMusic = [node.getComponent(Item).title, node.getComponent(Item).clip];
+                    node.setScale(1, 1);
+
+                    // 難易度選択ダイアログを出す
+                    let dialog = cc.instantiate(this.dialogPrefab);
+                    dialog.parent = this.node.parent;
+                    console.log(1);
+                    // dialog.getComponent(Dialog).showDialog(dialogType.difficulty);
+                }, item);
                 this.contentChild.push(item);
             });
 
-            // // なぜかItem以下がundefindになる
-            // let firstMusic = this.contentChild[0];
-            // firstMusic.children[1].setScale(1.2, 1.2);
+            // なぜかItem以下がundefindになる
+            let firstMusic = this.contentChild[0];
+            firstMusic.children[1].setScale(1.2, 1.2);
 
-            // let firstMusicItem = this.contentChild[0].getComponent(Item);
-            // this.audioId = cc.audioEngine.playMusic(firstMusicItem.clip, false);
-            // this.bgmTitle = firstMusicItem.title;
-            // console.log(this.bgmTitle)
-            // cc.loader.loadRes(firstMusicItem.backgroundImage, cc.SpriteFrame, (err, res) => {
-            //     if (err) {
-            //         cc.error(err);
-            //         return;
-            //     }
-            //     this.backgroundView.spriteFrame = res;
-            // });
+            let firstMusicItem = this.contentChild[0].getComponent(Item);
+            cc.audioEngine.playMusic(firstMusicItem.clip, false);
+            this.bgmTitle = firstMusicItem.title;
+            cc.loader.loadRes(firstMusicItem.backgroundImage, cc.SpriteFrame, (err, res) => {
+                if (err) {
+                    cc.error(err);
+                    return;
+                }
+                this.backgroundView.spriteFrame = res;
+            });
         });
-    }
-
-    onTouchStartMusicTitle(event: cc.Event) {
-        let node: cc.Node = event.target;
-        node.setScale(1.2, 1.2);
-    }
-
-    onTouchEndMusicTitle(event: cc.Event) {
-        let node: cc.Node = event.target;
-        selectedMusic = [node.getComponent(Item).title, node.getComponent(Item).clip];
-        node.setScale(1, 1);
-
-        // 難易度選択ダイアログを出す
-        let dialog = cc.instantiate(this.dialogPrefab);
-        dialog.getComponent(Dialog).showDialog(dialogType.difficulty);
     }
 
     // 曖昧な位置にいたとき近くの選択肢に移動する
@@ -121,18 +118,18 @@ export default class StartMenu extends cc.Component {
         let tween = new cc.Tween().target(this.content)
             .to(0.5, { position: new cc.Vec2(0, moveTo) }, { progress: null, easing: null })
             .start();
-        // this.onScrolled();
+        this.onScrolled();
     }
 
     onScrolled() {
+        // 前に選択していたボタンのスケールを戻す
+        this.contentChild[this.procSelectedIdx].children[1].setScale(1, 1);
         this.contentChild.forEach((item, idx) => {
             if (this.selectionArea.containsRect(item.getBoundingBoxToWorld())) {
-                // 上にスクロール
-                if (idx > this.procSelectedIdx) { // item.create()
-
-                    // 下にスクロール
-                } else if (idx < this.procSelectedIdx) {
-
+                if (idx < this.procSelectedIdx) { // 上にスクロール
+                    cc.log("上")
+                } else if (idx > this.procSelectedIdx) { // 下にスクロール
+                    cc.log("下")
                 }
                 this.procSelectedIdx = idx;
 
@@ -151,13 +148,9 @@ export default class StartMenu extends cc.Component {
                 // 選択対象が変わったときBGMを切り替える
                 if (this.bgmTitle != item.getComponent(Item).title) {
                     cc.audioEngine.stopMusic();
-                    this.audioId = cc.audioEngine.playMusic(item.getComponent(Item).clip, false);
+                    cc.audioEngine.playMusic(item.getComponent(Item).clip, false);
                     this.bgmTitle = item.getComponent(Item).title;
                 }
-            } else {
-                // 全てにやる必要はない
-                // →indexもらえるからその前後1つで良い
-                item.children[1].setScale(1, 1);
             }
         });
     }
