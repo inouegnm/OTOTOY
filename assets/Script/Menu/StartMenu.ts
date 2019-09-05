@@ -3,6 +3,7 @@ import Dialog, { dialogType } from '../Dialog/Dialog';
 
 const { ccclass, property } = cc._decorator;
 
+// classへ変更export class selectedMusic {}
 export var selectedMusic: [string, cc.AudioClip] = [null, null];
 
 @ccclass
