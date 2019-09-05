@@ -1,17 +1,6 @@
-// Learn TypeScript:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/typescript.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
+import * as Setting from './Util/Setting';
 
 const { ccclass, property } = cc._decorator;
-
-const STARTMENU = "StartMenu";
-const GAMESCENE = "GameScene";
 
 @ccclass
 export default class SceneManager extends cc.Component {
@@ -20,7 +9,7 @@ export default class SceneManager extends cc.Component {
         // cc.director.preloadScene(STARTMENU, function () {
         //     cc.log('Next scene preloaded');
         // });
-        cc.director.loadScene(STARTMENU);
+        cc.director.loadScene(Setting.STARTMENU);
     }
 
     // update (dt) {}

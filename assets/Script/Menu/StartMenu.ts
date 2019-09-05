@@ -1,10 +1,8 @@
 import Item from '../Util/Item';
-import Dialog, { dialogType } from '../Dialog/Dialog';
+import { dialogType, musicSelection } from '../Util/Setting';
+import Dialog from '../Dialog/Dialog';
 
 const { ccclass, property } = cc._decorator;
-
-// classへ変更export class selectedMusic {}
-export var selectedMusic: [string, cc.AudioClip] = [null, null];
 
 @ccclass
 export default class StartMenu extends cc.Component {
@@ -12,11 +10,9 @@ export default class StartMenu extends cc.Component {
     @property(cc.Node)
     content: cc.Node = null;
 
-    itemPrefab: cc.Prefab = null;
-    dialogPrefab: cc.Prefab = null;
-
     backgroundView: cc.Sprite = null;
     contentChild: cc.Node[] = new Array();
+    dialog: Dialog = null;
     selectionArea: cc.Rect = null;
     musics: string[][] = new Array();
     currentBackgroundView: string = null;
@@ -40,44 +36,44 @@ export default class StartMenu extends cc.Component {
         this.currentBackgroundView = array[0][2];
 
         // onloadで読ませて保存だと初回instantiateがnullになること
-        cc.loader.loadResDir('prefab', cc.Prefab, (err, item) => {
+        cc.loader.loadResDir('prefab', cc.Prefab, (err, prefab) => {
             if (err) {
                 cc.error(err);
                 return;
             }
-            this.dialogPrefab = item[0];
-            this.itemPrefab = item[1];
             // 7以下の場合（あり得ない）は足りるように追加（後ほどあり得るかもしれないけど…）
             // while (array.length < 7) {
             //     let add = array[array.length - 2]
             //     array.push(add);
             // }
+            let insDialog: cc.Node = cc.instantiate(prefab[0]);
+            insDialog.setParent(this.node.parent);
+            insDialog.addComponent(Dialog);
             array.forEach((musicinfo) => {
-                let item = cc.instantiate(this.itemPrefab);
-                item.parent = this.content;
-                cc.loader.loadRes(musicinfo[1], cc.AudioClip, (err, clip: cc.AudioClip) => {
+                let insItem: cc.Node = cc.instantiate(prefab[1]);
+                insItem.setParent(this.content);
+                cc.loader.loadRes('musics/' + musicinfo[1], cc.AudioClip, (err, clip: cc.AudioClip) => {
                     if (err) {
                         cc.error(err);
                         return;
                     }
-                    item.getComponent(Item).setParam(musicinfo[0], clip, musicinfo[2]);
+                    insItem.getComponent(Item).setParam(musicinfo[0], clip, musicinfo[2]);
                 });
-                item.on(cc.Node.EventType.TOUCH_START, (event: cc.Event) => {
+                insItem.on(cc.Node.EventType.TOUCH_START, (event: cc.Event) => {
                     let node: cc.Node = event.target;
                     node.setScale(1.2, 1.2);
-                }, item);
-                item.on(cc.Node.EventType.TOUCH_END, (event: cc.Event) => {
+                }, insItem);
+                insItem.on(cc.Node.EventType.TOUCH_END, (event: cc.Event) => {
                     let node: cc.Node = event.target;
-                    selectedMusic = [node.getComponent(Item).title, node.getComponent(Item).clip];
+                    musicSelection.path = musicinfo[1];
+                    musicSelection.title = node.getComponent(Item).title;
+                    musicSelection.clip = node.getComponent(Item).clip;
                     node.setScale(1, 1);
 
                     // 難易度選択ダイアログを出す
-                    let dialog = cc.instantiate(this.dialogPrefab);
-                    dialog.parent = this.node.parent;
-                    console.log(1);
-                    // dialog.getComponent(Dialog).showDialog(dialogType.difficulty);
-                }, item);
-                this.contentChild.push(item);
+                    insDialog.getComponent(Dialog).showDialog(dialogType.difficulty);
+                }, insItem);
+                this.contentChild.push(insItem);
             });
             this.onTouchEnd()
         });
@@ -150,20 +146,20 @@ export default class StartMenu extends cc.Component {
 
     // 現時点ではローカルに置いているが将来的にはクラウド管理がいい
     forDebug() {
-        this.musics.push(['Protocol Omega', 'musics/ADDrumnBass3/1', 'image/cover/ADDrumnBass']);
-        this.musics.push(['Open your eyes you freak', 'musics/ADDrumnBass3/2', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Black Future', 'musics/ADDrumnBass3/3', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Formula', 'musics/ADDrumnBass3/4', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Eruption', 'musics/ADDrumnBass3/5', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Hacker', 'musics/ADDrumnBass3/6', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['4_3', 'musics/ADDrumnBass3/7', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Broken', 'musics/ADDrumnBass3/8', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['I\'m a Fighter', 'musics/ADDrumnBass3/9', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Finally Puzzle', 'musics/ADDrumnBass3/10', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Dawnscape', 'musics/ADDrumnBass3/11', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['Central Nucleus', 'musics/ADDrumnBass3/12', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['So Far Gone', 'musics/ADDrumnBass3/13', 'image/cover/ADDrumnBass3']);
-        this.musics.push(['physics', 'musics/ADDrumnBass3/14', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Protocol Omega', 'ADDrumnBass3/1', 'image/cover/ADDrumnBass']);
+        this.musics.push(['Open your eyes you freak', 'ADDrumnBass3/2', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Black Future', 'ADDrumnBass3/3', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Formula', 'ADDrumnBass3/4', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Eruption', 'ADDrumnBass3/5', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Hacker', 'ADDrumnBass3/6', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['4_3', 'ADDrumnBass3/7', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Broken', 'ADDrumnBass3/8', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['I\'m a Fighter', 'ADDrumnBass3/9', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Finally Puzzle', 'ADDrumnBass3/10', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Dawnscape', 'ADDrumnBass3/11', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['Central Nucleus', 'ADDrumnBass3/12', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['So Far Gone', 'ADDrumnBass3/13', 'image/cover/ADDrumnBass3']);
+        this.musics.push(['physics', 'ADDrumnBass3/14', 'image/cover/ADDrumnBass3']);
     }
     // update (dt) {}
 }
