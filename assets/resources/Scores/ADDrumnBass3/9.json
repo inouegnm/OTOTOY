@@ -1,13 +1,35 @@
 {
-    "difficulty": [
-        {
-            "Easy": []
-        },
-        {
-            "Normal": []
-        },
-        {
-            "Difficult": []
-        }
-    ]
+    "score": {
+        "Easy": [
+            {
+                "time": 0,
+                "position": 0
+            },
+            {
+                "time": 1,
+                "position": 1
+            }
+        ],
+        "Normal": [
+            {
+                "time": 0,
+                "position": 0
+            },
+            {
+                "time": 1,
+                "position": 1
+            }
+        ],
+        "Difficult": [
+            {
+                "time": 0,
+                "position": 0
+            },
+            {
+                "time": 1,
+                "position": 1
+            }
+        ]
+    },
+    "result": 0
 }

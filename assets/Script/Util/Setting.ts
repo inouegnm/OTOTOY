@@ -21,16 +21,10 @@ export class Note {
 }
 
 export class Score {
-    score: {[key: level]: Note[]}
-    result: number
+    score: { [key: string]: Note[] } = {};
+    result: number = 0;
 }
 
 export var musicSelection: SelectedMusic = new SelectedMusic();
 export const STARTMENU = "StartMenu";
 export const GAMESCENE = "GameScene";
-
-enum level {
-    easy = 0,
-    normal = 1,
-    difficult = 2,
-}
