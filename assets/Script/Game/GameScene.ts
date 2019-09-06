@@ -6,10 +6,9 @@ const { ccclass, property } = cc._decorator;
 export default class GameScene extends cc.Component {
 
     start() {
-        cc.loader.load('Scores/' + Setting.musicSelection.path + '.json', (err, jsonObj) => {
-            console.log(jsonObj);
+        cc.loader.loadRes('Scores/' + Setting.musicSelection.path, (err, jsonObj: cc.JsonAsset) => {
+            console.log(jsonObj.json);
             console.log(JSON.parse(jsonObj))
-
         });
         cc.audioEngine.play(Setting.musicSelection.clip, false, 1);
     }
