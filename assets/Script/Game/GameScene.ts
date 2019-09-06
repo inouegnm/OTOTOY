@@ -5,11 +5,19 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class GameScene extends cc.Component {
 
+    audioID: number;
+    // scoreArray:[string, string, string] = new Array();
+
     start() {
-        cc.loader.loadRes('Scores/' + Setting.musicSelection.path, (err, jsonObj: cc.JsonAsset) => {
-            console.log(jsonObj.json);
+        cc.loader.loadRes('Scores/' + Setting.musicSelection.path, (err, jsonAst: cc.JsonAsset) => {
+            let jsonObj = jsonAst.json;
+            console.log(jsonObj);
             console.log(JSON.parse(jsonObj))
         });
-        cc.audioEngine.play(Setting.musicSelection.clip, false, 1);
+        this.audioID = cc.audioEngine.play(Setting.musicSelection.clip, false, 1);
+    }
+
+    update(dt) {
+        cc.audioEngine.getCurrentTime(this.audioID);
     }
 }
