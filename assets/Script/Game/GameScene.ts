@@ -7,34 +7,40 @@ export default class GameScene extends cc.Component {
 
     @property(cc.Node)
     countdownPanel: cc.Node = null;
+    @property(cc.Node)
+    scoreNode: cc.Node = null;
 
     audioID: number;
     score: Setting.Note[] = new Array();
-
-    // scoreArray:[string, string, string] = new Array()
+    dialog: cc.Node = null;
 
     onLoad() {
-        cc.loader.loadRes('Scores/' + Setting.musicSelection.path, (err, jsonAst: cc.JsonAsset) => {
+        if (true) {
+            Setting.musicSetting.difficulty = "Easy"
+            Setting.musicSetting.path = "ADDrumnBass3/9"
+        }
+
+        cc.loader.loadRes('Scores/' + Setting.musicSetting.path, (err, jsonAst: cc.JsonAsset) => {
             let jsonObj = jsonAst.json;
-            this.score = jsonObj["score"][Setting.musicSelection.difficulty];
+            this.score = jsonObj["score"][Setting.musicSetting.difficulty];
             console.log(this.score);
         });
         cc.loader.loadResDir('prefab', (err, prefab) => {
-            let dialog: cc.Node = cc.instantiate(prefab[0]);
+            this.dialog = cc.instantiate(prefab[0]);
             this.score.forEach(note => {
                 let n: cc.Node = cc.instantiate(prefab[2]);
-                // i.setPosition(note["position"])
-
+                n.setParent(this.scoreNode);
+                n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * Setting.musicSetting.noteSpeed));
             });
             this.countdown();
         })
-
     }
 
     start() {
     }
 
     countdown() {
+        console.log(this.scoreNode)
         let tween = new cc.Tween().target(this.countdownPanel)
             .call(() => {
                 this.countdownPanel.getComponent(cc.Label).string = '3';
@@ -51,12 +57,12 @@ export default class GameScene extends cc.Component {
             .call(() => {
                 this.countdownPanel.getComponent(cc.Label).string = 'Start!';
                 this.countdownPanel.active = false;
-                this.audioID = cc.audioEngine.play(Setting.musicSelection.clip, false, 1);
+                this.audioID = cc.audioEngine.play(Setting.musicSetting.clip, false, 1);
             });
         tween.start();
     }
+    update(dt: number) {
+        // cc.audioEngine.getCurrentTime(this.audioID);
 
-    update(dt: any) {
-        cc.audioEngine.getCurrentTime(this.audioID);
     }
 }

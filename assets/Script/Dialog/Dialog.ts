@@ -11,7 +11,7 @@ export default class Dialog extends cc.Component {
         });
         switch (type) {
             case dialogType.difficulty:
-                this.node.children[1].children[type].children[0].getComponent(cc.Label).string = Setting.musicSelection.title;
+                this.node.children[1].children[type].children[0].getComponent(cc.Label).string = Setting.musicSetting.title;
                 break;
 
             case dialogType.setting:
@@ -34,7 +34,7 @@ export default class Dialog extends cc.Component {
 
     onClickStartGame(event: cc.Event) {
         let target: cc.Node = event.target;
-        Setting.musicSelection.difficulty = target.name;
+        Setting.musicSetting.difficulty = target.name;
         cc.director.loadScene(Setting.GAMESCENE);
     }
 }

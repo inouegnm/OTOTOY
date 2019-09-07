@@ -1,5 +1,5 @@
 import Item from '../Util/Item';
-import { dialogType, musicSelection } from '../Util/Setting';
+import { dialogType, musicSetting } from '../Util/Setting';
 import Dialog from '../Dialog/Dialog';
 
 const { ccclass, property } = cc._decorator;
@@ -65,9 +65,9 @@ export default class StartMenu extends cc.Component {
                 }, insItem);
                 insItem.on(cc.Node.EventType.TOUCH_END, (event: cc.Event) => {
                     let node: cc.Node = event.target;
-                    musicSelection.path = musicinfo[1];
-                    musicSelection.title = node.getComponent(Item).title;
-                    musicSelection.clip = node.getComponent(Item).clip;
+                    musicSetting.path = musicinfo[1];
+                    musicSetting.title = node.getComponent(Item).title;
+                    musicSetting.clip = node.getComponent(Item).clip;
                     node.setScale(1, 1);
 
                     // 難易度選択ダイアログを出す

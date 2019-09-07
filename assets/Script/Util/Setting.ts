@@ -1,5 +1,4 @@
 export default class Setting {
-
 }
 
 export enum dialogType {
@@ -8,16 +7,17 @@ export enum dialogType {
     pause = 2,
 }
 
-export class SelectedMusic {
-    public title: string = null;
-    public path: string = null;
-    public clip: cc.AudioClip = null;
-    public difficulty: string = null;
+export class MusicSetting {
+    title: string = null;
+    path: string = null;
+    clip: cc.AudioClip = null;
+    difficulty: string = null;
+    noteSpeed: number = 5;
 }
 
 export class Note {
-    time: number | number[]
-    position: number | number[]
+    time: number;
+    position: number | number[];
 }
 
 export class Score {
@@ -25,6 +25,6 @@ export class Score {
     result: number = 0;
 }
 
-export var musicSelection: SelectedMusic = new SelectedMusic();
-export const STARTMENU = "StartMenu";
-export const GAMESCENE = "GameScene";
+export var musicSetting: MusicSetting = new MusicSetting();
+export const STARTMENU: string = "StartMenu";
+export const GAMESCENE: string = "GameScene";
