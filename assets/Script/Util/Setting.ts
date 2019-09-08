@@ -28,3 +28,4 @@ export class Score {
 export var musicSetting: MusicSetting = new MusicSetting();
 export const STARTMENU: string = "StartMenu";
 export const GAMESCENE: string = "GameScene";
+export const RESULTSCENE: string = "ResultScene";
