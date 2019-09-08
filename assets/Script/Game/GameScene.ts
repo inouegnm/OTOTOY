@@ -35,10 +35,10 @@ export default class GameScene extends cc.Component {
             this.score.forEach(note => {
                 let n: cc.Node = cc.instantiate(prefab[2]);
                 n.setParent(this.scoreNode);
-                let y = note.time * Setting.musicSetting.noteSpeed;
+                let y = note[“time”] * Setting.musicSetting.noteSpeed;
                 // 3Dにする場合
                 // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * Setting.musicSetting.noteSpeed));
-                n.setPosition(new cc.Vec2(note.position[0], y));
+                n.setPosition(new cc.Vec2(note[“position”][0], y));
                 this.scoreNode.height += y;
             });
             this.scoreNode.setPosition(0, this.scoreNode.height);
