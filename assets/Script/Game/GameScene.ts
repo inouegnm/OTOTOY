@@ -9,6 +9,8 @@ export default class GameScene extends cc.Component {
     countdownPanel: cc.Node = null;
     @property(cc.Node)
     scoreNode: cc.Node = null;
+    @property(cc.Node)
+    judgeBar: cc.Node = null;
 
     audioID: number = null;
     score: Setting.Note[] = new Array();
@@ -16,15 +18,16 @@ export default class GameScene extends cc.Component {
 
     onLoad() {
         if (true) {
-            Setting.musicSetting.difficulty = "Easy"
-            Setting.musicSetting.path = "ADDrumnBass3/9"
+            Setting.musicSetting.difficulty = "Easy";
+            Setting.musicSetting.path = "ADDrumnBass3/9";
             cc.loader.loadRes('musics/' + Setting.musicSetting.path, (err, clip) => {
-                Setting.musicSetting.clip = clip
-            })
+                Setting.musicSetting.clip = clip;
+            });
         }
 
         cc.loader.loadRes('Scores/' + Setting.musicSetting.path, (err, jsonAst: cc.JsonAsset) => {
             let jsonObj = jsonAst.json;
+            console.log(JSON.parse(jsonObj));
             this.score = jsonObj["score"][Setting.musicSetting.difficulty];
         });
         cc.loader.loadResDir('prefab', (err, prefab) => {
@@ -32,10 +35,10 @@ export default class GameScene extends cc.Component {
             this.score.forEach(note => {
                 let n: cc.Node = cc.instantiate(prefab[2]);
                 n.setParent(this.scoreNode);
-                let y = note["time"] * Setting.musicSetting.noteSpeed;
+                let y = note.time * Setting.musicSetting.noteSpeed;
                 // 3Dにする場合
                 // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * Setting.musicSetting.noteSpeed));
-                n.setPosition(new cc.Vec2(note["position"][0], y));
+                n.setPosition(new cc.Vec2(note.position[0], y));
                 this.scoreNode.height += y;
             });
             this.scoreNode.setPosition(0, this.scoreNode.height);
@@ -44,6 +47,11 @@ export default class GameScene extends cc.Component {
     }
 
     start() {
+        this.judgeBar.on(cc.Node.EventType.TOUCH_START, () => {
+            if (this.audioID != undefined || this.audioID != -1) {
+                let delay = this.score[98].time - cc.audioEngine.getCurrentTime(this.audioID);
+            }
+        }, this.judgeBar.children[0]);
     }
 
     countdown() {
@@ -77,7 +85,7 @@ export default class GameScene extends cc.Component {
                 this.schedule(waitAudioEngine, 0);
                 cc.audioEngine.setFinishCallback(this.audioID, () => {
                     cc.director.loadScene(Setting.RESULTSCENE);
-                })
+                });
             });
         tween.start();
     }
