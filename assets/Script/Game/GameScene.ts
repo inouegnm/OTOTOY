@@ -55,6 +55,7 @@ export default class GameScene extends cc.Component {
     }
 
     countdown() {
+        // play直後だとaudioIDが正しく返されないため、ループで待つ
         let waitAudioEngine = () => {
             if (this.audioID != undefined || this.audioID != -1) {
                 if (cc.audioEngine.getState(this.audioID) == cc.audioEngine.AudioState.PLAYING) {
