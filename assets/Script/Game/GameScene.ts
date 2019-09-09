@@ -17,6 +17,8 @@ export default class GameScene extends cc.Component {
     dialog: cc.Node = null;
     currentIndex: number = 0;
 
+    noteSpeed: number = Setting.musicSetting.noteSpeed * 10;
+
     onLoad() {
         if (true) {
             Setting.musicSetting.difficulty = "Easy";
@@ -28,26 +30,22 @@ export default class GameScene extends cc.Component {
 
         cc.loader.loadRes('Scores/' + Setting.musicSetting.path, (err, jsonAst: cc.JsonAsset) => {
             let jsonObj = jsonAst.json;
-            console.log(JSON.parse(jsonObj));
+            // console.log(JSON.parse(jsonObj));
             this.score = jsonObj["score"][Setting.musicSetting.difficulty];
         });
         cc.loader.loadResDir('prefab', (err, prefab) => {
             this.dialog = cc.instantiate(prefab[0]);
             this.score.forEach(note => {
                 note.time = note["time"];
-                note.position = note["position"][0];
+                note.position = note["position"];
 
                 let n: cc.Node = cc.instantiate(prefab[2]);
                 n.setParent(this.scoreNode);
-                let y = note["time"] * Setting.musicSetting.noteSpeed;
-                this.scoreNode.height += y;
-                console.log(this.scoreNode.height)
-                // 3Dにする場合
-                // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * Setting.musicSetting.noteSpeed));
+                let y = note["time"] * this.noteSpeed;
+                // 3Dにする場合[0]
+                // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * this.noteSpeed));
                 n.setPosition(new cc.Vec2(note["position"][0], y));
-                console.log(n.height)
             });
-            this.scoreNode.setPosition(0, this.scoreNode.height);
             this.countdown();
         });
     }
@@ -56,7 +54,7 @@ export default class GameScene extends cc.Component {
         this.judgeBar.on(cc.Node.EventType.TOUCH_START, () => {
             if (this.audioID != undefined || this.audioID != -1) {
                 let delay = this.score[this.currentIndex].time - cc.audioEngine.getCurrentTime(this.audioID);
-                
+
             }
         }, this.judgeBar.children[0]);
     }
@@ -66,8 +64,15 @@ export default class GameScene extends cc.Component {
         let waitAudioEngine = () => {
             if (this.audioID != undefined || this.audioID != -1) {
                 if (cc.audioEngine.getState(this.audioID) == cc.audioEngine.AudioState.PLAYING) {
+                    let duration = cc.audioEngine.getDuration(this.audioID)
+
+                    // 譜面の高さがここでしか計算できない
+                    this.scoreNode.height = duration * this.noteSpeed;
+                    this.scoreNode.setPosition(new cc.Vec2(0, this.scoreNode.height - 224));
+                    this.scoreNode.active = true;
+
                     let tween = new cc.Tween().target(this.scoreNode)
-                        .to(cc.audioEngine.getDuration(this.audioID), { position: new cc.Vec2(0, -224) }, { progress: null, easing: null });
+                        .to(duration, { position: new cc.Vec2(0, -224) }, { progress: null, easing: null });
                     tween.start();
                     this.unschedule(waitAudioEngine);
                 }
@@ -99,6 +104,7 @@ export default class GameScene extends cc.Component {
     }
 
     update(dt: number) {
+        console.log(this.scoreNode.position)
         // if (this.audioID != undefined || this.audioID != -1) {
         //     if (cc.audioEngine.getState(this.audioID) == cc.audioEngine.AudioState.PLAYING) {
         //         // console.log(cc.audioEngine.getCurrentTime(this.audioID));
