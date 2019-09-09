@@ -15,6 +15,7 @@ export default class GameScene extends cc.Component {
     audioID: number = null;
     score: Setting.Note[] = new Array();
     dialog: cc.Node = null;
+    currentIndex: number = 0;
 
     onLoad() {
         if (true) {
@@ -33,23 +34,29 @@ export default class GameScene extends cc.Component {
         cc.loader.loadResDir('prefab', (err, prefab) => {
             this.dialog = cc.instantiate(prefab[0]);
             this.score.forEach(note => {
+                note.time = note["time"];
+                note.position = note["position"][0];
+
                 let n: cc.Node = cc.instantiate(prefab[2]);
                 n.setParent(this.scoreNode);
                 let y = note["time"] * Setting.musicSetting.noteSpeed;
+                this.scoreNode.height += y;
+                console.log(this.scoreNode.height)
                 // 3Dにする場合
                 // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * Setting.musicSetting.noteSpeed));
                 n.setPosition(new cc.Vec2(note["position"][0], y));
-                this.scoreNode.height += y;
+                console.log(n.height)
             });
             this.scoreNode.setPosition(0, this.scoreNode.height);
             this.countdown();
-        })
+        });
     }
 
     start() {
         this.judgeBar.on(cc.Node.EventType.TOUCH_START, () => {
             if (this.audioID != undefined || this.audioID != -1) {
-                let delay = this.score[98].time - cc.audioEngine.getCurrentTime(this.audioID);
+                let delay = this.score[this.currentIndex].time - cc.audioEngine.getCurrentTime(this.audioID);
+                
             }
         }, this.judgeBar.children[0]);
     }
