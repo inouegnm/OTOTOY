@@ -41,8 +41,11 @@ export default class GameScene extends cc.Component {
 
                 let n: cc.Node = cc.instantiate(prefab[2]);
                 n.setParent(this.scoreNode);
+
+                // 近い位置に固まって生成される
                 let y = note["time"] * this.noteSpeed;
-                // 3Dにする場合[0]
+
+                // 3Dにする場合[0]将来的に切り替えとかできたら面白そう
                 // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * this.noteSpeed));
                 n.setPosition(new cc.Vec2(note["position"][0], y));
             });
@@ -54,7 +57,20 @@ export default class GameScene extends cc.Component {
         this.judgeBar.on(cc.Node.EventType.TOUCH_START, () => {
             if (this.audioID != undefined || this.audioID != -1) {
                 let delay = this.score[this.currentIndex].time - cc.audioEngine.getCurrentTime(this.audioID);
-
+                if (delay < 0.05 && delay > -0.05) {
+                    // perfect
+                    console.log(delay);
+                } else if (delay < 0.1 && delay > -0.1) {
+                    // good
+                    console.log(delay);
+                } else if (delay < 0.2 && delay > -0.2) {
+                    // bad
+                    console.log(delay);
+                } else {
+                    console.log(delay);
+                    return;
+                }
+                this.currentIndex++;
             }
         }, this.judgeBar.children[0]);
     }
@@ -67,6 +83,7 @@ export default class GameScene extends cc.Component {
                     let duration = cc.audioEngine.getDuration(this.audioID)
 
                     // 譜面の高さがここでしか計算できない
+                    // onloadでノーツ生成時にやったほうがいい？
                     this.scoreNode.height = duration * this.noteSpeed;
                     this.scoreNode.setPosition(new cc.Vec2(0, this.scoreNode.height - 224));
                     this.scoreNode.active = true;
