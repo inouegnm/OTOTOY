@@ -3,60 +3,66 @@ import * as Setting from '../Util/Setting';
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class GameScene extends cc.Component {
-
+export class GameScene extends cc.Component {
+    @property(cc.Label)
+    private countdownPanel: cc.Label = undefined;
     @property(cc.Node)
-    countdownPanel: cc.Node = null;
+    private scoreNode: cc.Node = undefined;
     @property(cc.Node)
-    scoreNode: cc.Node = null;
-    @property(cc.Node)
-    judgeBar: cc.Node = null;
+    private judgeBar: cc.Node = undefined;
 
-    audioID: number = null;
-    score: Setting.Note[] = new Array();
-    dialog: cc.Node = null;
-    currentIndex: number = 0;
+    private readonly noteSpeed: number = Setting.musicSetting.noteSpeed * 10;
+    private readonly score: Setting.Note[] = [];
 
-    noteSpeed: number = Setting.musicSetting.noteSpeed * 10;
+    private audioId: number = undefined;
+    private dialog: cc.Node = undefined;
+    private currentIndex: number = 0;
 
-    onLoad() {
-        if (true) {
-            Setting.musicSetting.difficulty = "Easy";
-            Setting.musicSetting.path = "ADDrumnBass3/9";
-            cc.loader.loadRes('musics/' + Setting.musicSetting.path, (err, clip) => {
-                Setting.musicSetting.clip = clip;
-            });
-        }
 
-        cc.loader.loadRes('Scores/' + Setting.musicSetting.path, (err, jsonAst: cc.JsonAsset) => {
-            let jsonObj = jsonAst.json;
-            // console.log(JSON.parse(jsonObj));
-            this.score = jsonObj["score"][Setting.musicSetting.difficulty];
+    public onLoad(): void {
+        Setting.musicSetting.difficulty = "Easy";
+        Setting.musicSetting.path = "ADDrumnBass3/9";
+
+        cc.loader.loadRes("musics/" + Setting.musicSetting.path, (error, clip: cc.AudioClip) => {
+            Setting.musicSetting.clip = clip;
         });
-        cc.loader.loadResDir('prefab', (err, prefab) => {
-            this.dialog = cc.instantiate(prefab[0]);
+        cc.loader.loadRes("Scores/" + Setting.musicSetting.path, (error, jsonAsset: cc.JsonAsset) => {
+            const json = jsonAsset.json;
+            this.score.length = 0;
+            this.score.push(json["score"][Setting.musicSetting.difficulty]);
+        });
+
+        cc.loader.loadResDir("prefab", (error, prefabs: cc.Prefab[]) => {
+            this.dialog = cc.instantiate(prefabs[0]);
             this.score.forEach(note => {
                 note.time = note["time"];
                 note.position = note["position"];
 
-                let n: cc.Node = cc.instantiate(prefab[2]);
-                n.setParent(this.scoreNode);
+                const node: cc.Node = cc.instantiate(prefabs[2]);
+                node.setParent(this.scoreNode);
 
                 // 近い位置に固まって生成される
-                let y = note["time"] * this.noteSpeed;
+                const positionY = note["time"] * this.noteSpeed;
 
                 // 3Dにする場合[0]将来的に切り替えとかできたら面白そう
                 // n.setPosition(new cc.Vec3(note["position"][0], note["position"][1], note["time"] * this.noteSpeed));
-                n.setPosition(new cc.Vec2(note["position"][0], y));
+                node.setPosition(new cc.Vec2(note["position"][0], positionY));
             });
+
             this.countdown();
         });
     }
 
-    start() {
-        this.judgeBar.on(cc.Node.EventType.TOUCH_START, () => {
-            if (this.audioID != undefined || this.audioID != -1) {
-                let delay = this.score[this.currentIndex].time - cc.audioEngine.getCurrentTime(this.audioID);
+    public start(): void {
+        this.judgeBar.on(
+            cc.Node.EventType.TOUCH_START, () => {
+                // TODO: 条件式変形したけど合ってるかは不明
+                // if (this.audioId !== undefined || this.audioId != -1)
+                if (!this.audioId || this.audioId === -1) {
+                    return;
+                }
+
+                const delay = (this.score[this.currentIndex].time - cc.audioEngine.getCurrentTime(this.audioId));
                 if (delay < 0.05 && delay > -0.05) {
                     // perfect
                     console.log(delay);
@@ -71,61 +77,68 @@ export default class GameScene extends cc.Component {
                     return;
                 }
                 this.currentIndex++;
-            }
-        }, this.judgeBar.children[0]);
+            },
+            this.judgeBar.children[0]
+        );
     }
 
-    countdown() {
-        // play直後だとaudioIDが正しく返されないため、ループで待つ
-        let waitAudioEngine = () => {
-            if (this.audioID != undefined || this.audioID != -1) {
-                if (cc.audioEngine.getState(this.audioID) == cc.audioEngine.AudioState.PLAYING) {
-                    let duration = cc.audioEngine.getDuration(this.audioID)
-
-                    // 譜面の高さがここでしか計算できない
-                    // onloadでノーツ生成時にやったほうがいい？
-                    this.scoreNode.height = duration * this.noteSpeed;
-                    this.scoreNode.setPosition(new cc.Vec2(0, this.scoreNode.height - 224));
-                    this.scoreNode.active = true;
-
-                    let tween = new cc.Tween().target(this.scoreNode)
-                        .to(duration, { position: new cc.Vec2(0, -224) }, { progress: null, easing: null });
-                    tween.start();
-                    this.unschedule(waitAudioEngine);
-                }
-            }
-        }
-        let tween = new cc.Tween().target(this.countdownPanel)
-            .call(() => {
-                this.countdownPanel.getComponent(cc.Label).string = '3';
-            })
-            .delay(1)
-            .call(() => {
-                this.countdownPanel.getComponent(cc.Label).string = '2';
-            })
-            .delay(1)
-            .call(() => {
-                this.countdownPanel.getComponent(cc.Label).string = '1';
-            })
-            .delay(1)
-            .call(() => {
-                this.countdownPanel.getComponent(cc.Label).string = 'Start!';
-                this.countdownPanel.active = false;
-                this.audioID = cc.audioEngine.play(Setting.musicSetting.clip, false, 1);
-                this.schedule(waitAudioEngine, 0);
-                cc.audioEngine.setFinishCallback(this.audioID, () => {
-                    cc.director.loadScene(Setting.RESULTSCENE);
-                });
-            });
-        tween.start();
-    }
-
-    update(dt: number) {
+    public update(dt: number): void {
         console.log(this.scoreNode.position)
         // if (this.audioID != undefined || this.audioID != -1) {
         //     if (cc.audioEngine.getState(this.audioID) == cc.audioEngine.AudioState.PLAYING) {
         //         // console.log(cc.audioEngine.getCurrentTime(this.audioID));
         //     }
         // }
+    }
+
+    private countdown(): void {
+        // play直後だとaudioIDが正しく返されないため、ループで待つ
+        const waitAudioEngine = () => {
+            // TODO: 条件式変形したけど合ってるかは不明
+            // if (this.audioId !== undefined || this.audioId != -1)
+            if (!this.audioId || this.audioId === -1) {
+                return;
+            }
+
+            if (cc.audioEngine.getState(this.audioId) !== cc.audioEngine.AudioState.PLAYING) {
+                return;
+            }
+
+            const duration = cc.audioEngine.getDuration(this.audioId)
+
+            // 譜面の高さがここでしか計算できない
+            // onloadでノーツ生成時にやったほうがいい？
+            this.scoreNode.height = duration * this.noteSpeed;
+            this.scoreNode.setPosition(new cc.Vec2(0, this.scoreNode.height - 224));
+            this.scoreNode.active = true;
+
+            const tween = new cc.Tween()
+                .target(this.scoreNode)
+                .to(
+                    duration,
+                    ({ position: new cc.Vec2(0, -224) }),
+                    ({ progress: undefined, easing: undefined })
+                );
+            tween.start();
+
+            this.unschedule(waitAudioEngine);
+        }
+
+        const tween = new cc.Tween().target(this.countdownPanel)
+            .call(() => this.countdownPanel.string = "3")
+            .delay(1)
+            .call(() => this.countdownPanel.string = "2")
+            .delay(1)
+            .call(() => this.countdownPanel.string = "1")
+            .delay(1)
+            .call(() => {
+                this.countdownPanel.string = "Start!";
+                this.countdownPanel.node.active = false;
+
+                this.audioId = cc.audioEngine.play(Setting.musicSetting.clip, false, 1);
+                this.schedule(waitAudioEngine, 0);
+                cc.audioEngine.setFinishCallback(this.audioId, () => cc.director.loadScene(Setting.RESULTSCENE));
+            });
+        tween.start();
     }
 }
